@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:alpine
+    container_name: simple_bank
+    restart: always
+    tty: true
+    ports:
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - TZ=America/Sao_Paulo
+volumes:
+  db:

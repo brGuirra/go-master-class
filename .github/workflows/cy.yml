@@ -1,0 +1,58 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: ci-test
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+env:
+  database_name: ${{ secrets.DATABASE_NAME }}
+  database_username: ${{ secrets.DATABASE_USERNAME }}
+  database_password: ${{ secrets.DATABASE_PASSWORD }}
+  database_timezone: ${{ secrets.DATABASE_TIMEZONE }}
+  database_version: ${{ secrets.DATABASE_VERSION }}
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:$database_version
+        env:
+          POSTGRES_DB: $database_name
+          POSTGRES_USER: $database_username
+          POSTGRES_PASSWORD: $database_password
+          TZ: $database_timezone
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Install golang-migrate cli
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz | tar xvz
+          sudo mv migrate /usr/bin/
+          which migrate
+
+      - name: Run migrations
+        run: migrate --path db/migration -database "postgresql://$database_username:$database_password@localhost:5432/$database_name?sslmode=disable" -verbose up
+
+      - name: Test
+        run: make test

@@ -2,15 +2,18 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
 func TestTransferTx(t *testing.T) {
+	store := NewStore(testDB)
+
 	fromAccount := createRandomAccount(t)
 	toAccount := createRandomAccount(t)
-	store := NewStore(testDB)
+	fmt.Println(">>before transfers:", fromAccount.Balance, toAccount.Balance)
 
 	// run n concurrent transfer transactions
 	n := 5
@@ -33,6 +36,8 @@ func TestTransferTx(t *testing.T) {
 	}
 
 	// check results
+	existed := make(map[int]bool)
+
 	for i := 0; i < n; i++ {
 		err := <-errs
 		require.NoError(t, err)
@@ -74,6 +79,38 @@ func TestTransferTx(t *testing.T) {
 		_, err = store.GetEntry(context.Background(), toEntry.ID)
 		require.NoError(t, err)
 
-		// TODO: check account's balance
+		// check accounts
+		updatedFromAccount := result.FromAccount
+		require.NotEmpty(t, updatedFromAccount)
+		require.Equal(t, updatedFromAccount.ID, fromAccount.ID)
+
+		updatedToAccount := result.ToAccount
+		require.NotEmpty(t, updatedToAccount)
+		require.Equal(t, updatedToAccount.ID, toAccount.ID)
+
+		// check account's balance
+		fmt.Println(">> tx:", updatedFromAccount.Balance, updatedToAccount.Balance)
+		fromDiff := fromAccount.Balance - updatedFromAccount.Balance
+		toDiff := updatedToAccount.Balance - toAccount.Balance
+		require.Equal(t, fromDiff, toDiff)
+		require.Positive(t, fromDiff)
+		require.True(t, fromDiff%amount == 0)
+
+		k := int(fromDiff / amount)
+		require.True(t, k >= 1 && k <= n)
+		require.NotContains(t, existed, k)
+
+		existed[k] = true
 	}
+
+	// check final updated balances
+	updatedFromAccount, err := testQueries.GetAccount(context.Background(), fromAccount.ID)
+	require.NoError(t, err)
+
+	updatedToAccount, err := testQueries.GetAccount(context.Background(), toAccount.ID)
+	require.NoError(t, err)
+
+	fmt.Println(">>afters transfers:", updatedFromAccount.Balance, updatedToAccount.Balance)
+	require.Equal(t, fromAccount.Balance-int64(n)*amount, updatedFromAccount.Balance)
+	require.Equal(t, toAccount.Balance+int64(n)*amount, updatedToAccount.Balance)
 }

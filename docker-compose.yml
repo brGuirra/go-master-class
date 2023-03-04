@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:${DATABASE_VERSION}
+    image: ${DATABASE_VERSION}
     container_name: ${CONTAINER_NAME}
     restart: always
     tty: true

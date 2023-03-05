@@ -26,6 +26,9 @@ dcdowndev:
 	docker-compose --env-file app.env down
 
 server:
-	go run main.go	
+	go run main.go
 
-.PHONY: createdb dropdb migrateup migratedown sqlc test dcupdev dcdowndev server
+mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/brGuirra/simple-bank/db/sqlc Store
+
+.PHONY: createdb dropdb migrateup migratedown sqlc test dcupdev dcdowndev server mock

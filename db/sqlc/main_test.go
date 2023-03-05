@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/brGuirra/simple-bank/utils"
+	_ "github.com/golang/mock/mockgen/model"
 	_ "github.com/lib/pq"
 )
 

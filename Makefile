@@ -1,5 +1,5 @@
 #!make
-include .env.development
+include app.env
 
 createdb:
 	docker exec -it ${CONTAINER_NAME} createdb --username=${DATABASE_USERNAME} --owner=${DATABASE_USERNAME} ${DATABASE_NAME}
@@ -20,10 +20,10 @@ test:
 	go test -v -cover ./...
 
 dcupdev:
-	docker-compose --env-file .env.development up -d
+	docker-compose --env-file app.env up -d
 
 dcdowndev:
-	docker-compose --env-file .env.development down
+	docker-compose --env-file app.env down
 
 server:
 	go run main.go	

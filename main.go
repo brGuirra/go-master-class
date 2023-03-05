@@ -3,24 +3,21 @@ package main
 import (
 	"database/sql"
 	"log"
-	"os"
 
 	"github.com/brGuirra/simple-bank/api"
 	db "github.com/brGuirra/simple-bank/db/sqlc"
-	"github.com/joho/godotenv"
+	"github.com/brGuirra/simple-bank/utils"
 
 	_ "github.com/lib/pq"
 )
 
-const environment = ".env.development"
-
 func main() {
-	err := godotenv.Load(environment)
+	config, err := utils.LoadConfig(".")
 	if err != nil {
-		log.Fatalln("cannot load env vars: ", err)
+		log.Fatalln("cannot load config: ", err)
 	}
 
-	conn, err := sql.Open(os.Getenv("DATABASE_DRIVER"), os.Getenv("DATABASE_URL"))
+	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatalln("cannot connect to database: ", err)
 	}
@@ -28,7 +25,7 @@ func main() {
 	store := db.NewStore(conn)
 	server := api.NewServer(store)
 
-	err = server.Start(os.Getenv("SERVER_BASE_URL"))
+	err = server.Start(config.ServerAddress)
 	if err != nil {
 		log.Fatalln("cannot start server: ", err)
 	}

@@ -25,4 +25,7 @@ dcupdev:
 dcdowndev:
 	docker-compose --env-file .env.development down
 
-.PHONY: createdb dropdb migrateup migratedown sqlc test dcupdev dcdowndev
+server:
+	go run main.go	
+
+.PHONY: createdb dropdb migrateup migratedown sqlc test dcupdev dcdowndev server

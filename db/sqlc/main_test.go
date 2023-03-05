@@ -11,7 +11,7 @@ import (
 
 const (
 	dbDriver = "postgres"
-	dbSource = "postgresql://root:docker@localhost:5432/simple_bank?sslmode=disable"
+	dbSource = "postgresql://docker:docker@localhost:5432/simple_bank?sslmode=disable"
 )
 
 var testQueries *Queries

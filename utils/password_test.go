@@ -19,13 +19,16 @@ func generateRandomPassword(t *testing.T) (password string, hashedPassword strin
 }
 
 func TestHashPassword(t *testing.T) {
-	generateRandomPassword(t)
+	password, hashedPassword1 := generateRandomPassword(t)
+
+	hashedPassword2, err := HashPassword(password)
+	require.NoError(t, err)
+	require.NotEqual(t, hashedPassword1, hashedPassword2)
 }
 
 func TestCheckPassword(t *testing.T) {
 	t.Run("valid password", func(t *testing.T) {
 		password, hashedPassword := generateRandomPassword(t)
-
 		err := CheckPassword(password, hashedPassword)
 		require.NoError(t, err)
 	})

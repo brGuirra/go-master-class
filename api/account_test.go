@@ -106,7 +106,7 @@ func TestGetAccountAPI(t *testing.T) {
 
 		t.Run(tc.name, func(t *testing.T) {
 			controller := gomock.NewController(t)
-			controller.Finish()
+			defer controller.Finish()
 
 			store := mockdb.NewMockStore(controller)
 			tc.buildSubs(store)

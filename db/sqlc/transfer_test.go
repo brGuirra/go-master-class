@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"testing"
 	"time"
 
@@ -50,41 +49,6 @@ func TestGetTransfer(t *testing.T) {
 	require.Equal(t, createdTransfer.ToAccountID, gotTransfer.ToAccountID)
 	require.Equal(t, createdTransfer.Amount, gotTransfer.Amount)
 	require.WithinDuration(t, createdTransfer.CreatedAt, gotTransfer.CreatedAt, time.Second)
-}
-
-func TestUpdateTransfer(t *testing.T) {
-	from := createRandomAccount(t)
-	to := createRandomAccount(t)
-	createdTransfer := createRandomTransfer(t, from, to)
-
-	arg := UpdateTransferParams{
-		ID:     createdTransfer.ID,
-		Amount: int64(gofakeit.Number(100, 1000)),
-	}
-
-	updatedTransfer, err := testQueries.UpdateTransfer(context.Background(), arg)
-	require.NoError(t, err)
-	require.NotEmpty(t, updatedTransfer)
-
-	require.Equal(t, createdTransfer.ID, updatedTransfer.ID)
-	require.Equal(t, createdTransfer.FromAccountID, updatedTransfer.FromAccountID)
-	require.Equal(t, createdTransfer.ToAccountID, updatedTransfer.ToAccountID)
-	require.Equal(t, arg.Amount, updatedTransfer.Amount)
-	require.WithinDuration(t, createdTransfer.CreatedAt, updatedTransfer.CreatedAt, time.Second)
-}
-
-func TestDeleteTransfer(t *testing.T) {
-	from := createRandomAccount(t)
-	to := createRandomAccount(t)
-	createdTransfer := createRandomTransfer(t, from, to)
-
-	err := testQueries.DeleteTransfer(context.Background(), createdTransfer.ID)
-	require.NoError(t, err)
-
-	gotTransfer, err := testQueries.GetTransfer(context.Background(), createdTransfer.ID)
-	require.Error(t, err)
-	require.EqualError(t, err, sql.ErrNoRows.Error())
-	require.Empty(t, gotTransfer)
 }
 
 func TestListTransfers(t *testing.T) {

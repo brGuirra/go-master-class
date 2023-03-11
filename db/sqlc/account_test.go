@@ -38,6 +38,19 @@ func TestCreateAccount(t *testing.T) {
 	createRandomAccount(t)
 }
 
+func TestGetAccountForUpdate(t *testing.T) {
+	createdAccount := createRandomAccount(t)
+	gotAccount, err := testQueries.GetAccountForUpdate(context.Background(), createdAccount.ID)
+	require.NoError(t, err)
+	require.NotEmpty(t, gotAccount)
+
+	require.Equal(t, createdAccount.ID, gotAccount.ID)
+	require.Equal(t, createdAccount.Owner, gotAccount.Owner)
+	require.Equal(t, createdAccount.Balance, gotAccount.Balance)
+	require.Equal(t, createdAccount.Currency, gotAccount.Currency)
+	require.WithinDuration(t, createdAccount.CreatedAt, gotAccount.CreatedAt, time.Second)
+}
+
 func TestGetAccount(t *testing.T) {
 	createdAccount := createRandomAccount(t)
 	gotAccount, err := testQueries.GetAccount(context.Background(), createdAccount.ID)

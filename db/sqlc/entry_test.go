@@ -37,14 +37,14 @@ func TestCreateEntry(t *testing.T) {
 func TestGetEntry(t *testing.T) {
 	account := createRandomAccount(t)
 	createdEntry := createRandomEntry(t, account)
-	gettedEntry, err := testQueries.GetEntry(context.Background(), createdEntry.ID)
+	gotEntry, err := testQueries.GetEntry(context.Background(), createdEntry.ID)
 	require.NoError(t, err)
-	require.NotEmpty(t, gettedEntry)
+	require.NotEmpty(t, gotEntry)
 
-	require.Equal(t, createdEntry.ID, gettedEntry.ID)
-	require.Equal(t, createdEntry.AccountID, gettedEntry.AccountID)
-	require.Equal(t, createdEntry.Amount, gettedEntry.Amount)
-	require.WithinDuration(t, createdEntry.CreatedAt, gettedEntry.CreatedAt, time.Second)
+	require.Equal(t, createdEntry.ID, gotEntry.ID)
+	require.Equal(t, createdEntry.AccountID, gotEntry.AccountID)
+	require.Equal(t, createdEntry.Amount, gotEntry.Amount)
+	require.WithinDuration(t, createdEntry.CreatedAt, gotEntry.CreatedAt, time.Second)
 }
 
 func TestUpdateEntry(t *testing.T) {
@@ -72,10 +72,10 @@ func TestDeleteEntry(t *testing.T) {
 	err := testQueries.DeleteEntry(context.Background(), createdEntry.ID)
 	require.NoError(t, err)
 
-	gettedEntry, err := testQueries.GetEntry(context.Background(), createdEntry.ID)
+	gotEntry, err := testQueries.GetEntry(context.Background(), createdEntry.ID)
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
-	require.Empty(t, gettedEntry)
+	require.Empty(t, gotEntry)
 }
 
 func TestListEntries(t *testing.T) {

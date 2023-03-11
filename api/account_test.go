@@ -111,7 +111,7 @@ func TestGetAccountAPI(t *testing.T) {
 			store := mockdb.NewMockStore(controller)
 			tc.buildSubs(store)
 
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/accounts/%d", tc.accountID)

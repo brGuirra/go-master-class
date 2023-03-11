@@ -41,15 +41,15 @@ func TestGetTransfer(t *testing.T) {
 	from := createRandomAccount(t)
 	to := createRandomAccount(t)
 	createdTransfer := createRandomTransfer(t, from, to)
-	gettedTransfer, err := testQueries.GetTransfer(context.Background(), createdTransfer.ID)
+	gotTransfer, err := testQueries.GetTransfer(context.Background(), createdTransfer.ID)
 	require.NoError(t, err)
-	require.NotEmpty(t, gettedTransfer)
+	require.NotEmpty(t, gotTransfer)
 
-	require.Equal(t, createdTransfer.ID, gettedTransfer.ID)
-	require.Equal(t, createdTransfer.FromAccountID, gettedTransfer.FromAccountID)
-	require.Equal(t, createdTransfer.ToAccountID, gettedTransfer.ToAccountID)
-	require.Equal(t, createdTransfer.Amount, gettedTransfer.Amount)
-	require.WithinDuration(t, createdTransfer.CreatedAt, gettedTransfer.CreatedAt, time.Second)
+	require.Equal(t, createdTransfer.ID, gotTransfer.ID)
+	require.Equal(t, createdTransfer.FromAccountID, gotTransfer.FromAccountID)
+	require.Equal(t, createdTransfer.ToAccountID, gotTransfer.ToAccountID)
+	require.Equal(t, createdTransfer.Amount, gotTransfer.Amount)
+	require.WithinDuration(t, createdTransfer.CreatedAt, gotTransfer.CreatedAt, time.Second)
 }
 
 func TestUpdateTransfer(t *testing.T) {
@@ -81,10 +81,10 @@ func TestDeleteTransfer(t *testing.T) {
 	err := testQueries.DeleteTransfer(context.Background(), createdTransfer.ID)
 	require.NoError(t, err)
 
-	gettedTransfer, err := testQueries.GetTransfer(context.Background(), createdTransfer.ID)
+	gotTransfer, err := testQueries.GetTransfer(context.Background(), createdTransfer.ID)
 	require.Error(t, err)
 	require.EqualError(t, err, sql.ErrNoRows.Error())
-	require.Empty(t, gettedTransfer)
+	require.Empty(t, gotTransfer)
 }
 
 func TestListTransfers(t *testing.T) {
